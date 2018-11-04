@@ -31,7 +31,10 @@ func OpenMmaped(name string) (Trie, error) {
 func openMmap(f *os.File, offset, length int) (*MmapedDoubleArray, error) {
 	b, err := syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
-		return nil, fmt.Errorf("mmap error, %v", err)
+		b, err = syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_PRIVATE)
+		if err != nil {
+			return nil, fmt.Errorf("mmap error, %v", err)
+		}
 	}
 	return &MmapedDoubleArray{
 		raw: bytes.NewReader(b),
