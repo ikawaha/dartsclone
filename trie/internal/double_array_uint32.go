@@ -1,4 +1,4 @@
-package trie
+package internal
 
 import (
 	"encoding/binary"
@@ -10,7 +10,7 @@ type DoubleArrayUint32 struct {
 	array []uint32
 }
 
-func Open(name string) (Trie, error) {
+func Open(name string) (*DoubleArrayUint32, error) {
 	f, err := os.Open(name)
 	if err != nil {
 		return nil, err
@@ -40,14 +40,17 @@ func (a DoubleArrayUint32) at(i uint32) (unit, error) {
 	return unit(a.array[i]), nil
 }
 
+// ExactMatchSearch searches TRIE by a given keyword and returns the id and it's length if found.
 func (a DoubleArrayUint32) ExactMatchSearch(key string) (id, size int, err error) {
 	return exactMatchSearch(a, key)
 }
 
+// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the ids and it's lengths if found.
 func (a DoubleArrayUint32) CommonPrefixSearch(key string, offset int) (ids, sizes []int, err error) {
 	return commonPrefixSearch(a, key, offset)
 }
 
+// CommonPrefixSearchCallback finds keywords sharing common prefix in an input and callback with id and it's length.
 func (a DoubleArrayUint32) CommonPrefixSearchCallback(key string, offset int, callback func(id, size int)) error {
 	return commonPrefixSearchCallback(a, key, offset, callback)
 }

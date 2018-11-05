@@ -1,4 +1,4 @@
-package trie
+package internal
 
 import (
 	"testing"
@@ -36,10 +36,10 @@ func TestUnit_SetOffset_GetOffset(t *testing.T) {
 	})
 	t.Run("too large offset", func(t *testing.T) {
 		var u unit
-		if err := u.setOffset(MaxOffset); err == nil {
+		if err := u.setOffset(maxOffset); err == nil {
 			t.Errorf("expected too large offset error")
 		}
-		if err := u.setOffset(MaxOffset - 1); err != nil {
+		if err := u.setOffset(maxOffset - 1); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 	})

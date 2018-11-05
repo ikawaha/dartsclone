@@ -1,6 +1,6 @@
 // +build mmap
 
-package trie
+package internal
 
 import (
 	"bytes"
@@ -21,7 +21,7 @@ type MmapedDoubleArray struct {
 	r   *bytes.Reader
 }
 
-func OpenMmaped(name string) (TrieCloser, error) {
+func OpenMmaped(name string) (*MmapedDoubleArray, error) {
 	f, err := os.Open(name)
 	if err != nil {
 		return nil, err
@@ -62,18 +62,22 @@ func (a MmapedDoubleArray) at(i uint32) (unit, error) {
 	return unit(ret), nil
 }
 
+// ExactMatchSearch searches TRIE by a given keyword and returns the id and it's length if found.
 func (a MmapedDoubleArray) ExactMatchSearch(key string) (id, size int, err error) {
 	return exactMatchSearch(a, key)
 }
 
+// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the ids and it's lengths if found.
 func (a MmapedDoubleArray) CommonPrefixSearch(key string, offset int) (ids, sizes []int, err error) {
 	return commonPrefixSearch(a, key, offset)
 }
 
+// CommonPrefixSearchCallback finds keywords sharing common prefix in an input and callback with id and it's length.
 func (a MmapedDoubleArray) CommonPrefixSearchCallback(key string, offset int, callback func(id, size int)) error {
 	return commonPrefixSearchCallback(a, key, offset, callback)
 }
 
+// Close deletes the mapped memory and closes the opened file.
 func (a MmapedDoubleArray) Close() error {
 	if err := syscall.Munmap(a.raw); err != nil {
 		return fmt.Errorf("munmap error, %v", err)

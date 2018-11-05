@@ -1,11 +1,10 @@
-package trie
+package internal
 
-type doubleArray interface {
-	Trie
+type arrayAt interface {
 	at(uint32) (unit, error)
 }
 
-func exactMatchSearch(a doubleArray, key string) (id, size int, err error) {
+func exactMatchSearch(a arrayAt, key string) (id, size int, err error) {
 	nodePos := uint32(0)
 	unit, err := a.at(nodePos)
 	if err != nil {
@@ -31,7 +30,7 @@ func exactMatchSearch(a doubleArray, key string) (id, size int, err error) {
 	return int(unit.value()), len(key), nil
 }
 
-func commonPrefixSearch(a doubleArray, key string, offset int) (ids, sizes []int, err error) {
+func commonPrefixSearch(a arrayAt, key string, offset int) (ids, sizes []int, err error) {
 	nodePos := uint32(0)
 	unit, err := a.at(nodePos)
 	if err != nil {
@@ -61,7 +60,7 @@ func commonPrefixSearch(a doubleArray, key string, offset int) (ids, sizes []int
 	return ids, sizes, nil
 }
 
-func commonPrefixSearchCallback(a doubleArray, key string, offset int, callback func(id, size int)) error {
+func commonPrefixSearchCallback(a arrayAt, key string, offset int, callback func(id, size int)) error {
 	nodePos := uint32(0)
 	unit, err := a.at(nodePos)
 	if err != nil {

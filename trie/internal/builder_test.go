@@ -1,4 +1,4 @@
-package trie
+package internal
 
 import (
 	"bufio"
@@ -14,7 +14,7 @@ func TestDoubleArrayBuilder_Build(t *testing.T) {
 		b := NewDoubleArrayBuilder(nil)
 		keys := []string{"aaa", "bbb"}
 		values := []uint32{7, 5}
-		if err := b.build(keys, values); err != nil {
+		if err := b.Build(keys, values); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 		da := DoubleArrayUint32{array: b.toArray()}
@@ -31,7 +31,7 @@ func TestDoubleArrayBuilder_Build(t *testing.T) {
 	t.Run("small test w/o values", func(t *testing.T) {
 		b := NewDoubleArrayBuilder(nil)
 		keys := []string{"aaa", "bbb"}
-		if err := b.build(keys, nil); err != nil {
+		if err := b.Build(keys, nil); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 		da := DoubleArrayUint32{array: b.toArray()}
@@ -63,7 +63,7 @@ func TestDoubleArrayBuilder_Build(t *testing.T) {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
 		b := NewDoubleArrayBuilder(nil)
-		if err := b.build(keys, values); err != nil {
+		if err := b.Build(keys, values); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 		da := DoubleArrayUint32{array: b.toArray()}
@@ -92,7 +92,7 @@ func TestDoubleArrayBuilder_Build(t *testing.T) {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
 		b := NewDoubleArrayBuilder(nil)
-		if err := b.build(keys, nil); err != nil {
+		if err := b.Build(keys, nil); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 		da := DoubleArrayUint32{array: b.toArray()}
@@ -111,7 +111,7 @@ func TestDoubleArrayBuilder_Build(t *testing.T) {
 func TestDoubleArrayBuilder_WriteTo(t *testing.T) {
 	t.Run("small test", func(t *testing.T) {
 
-		builder := doubleArrayBuilder{
+		builder := DoubleArrayBuilder{
 			units: []unit{1, 2, 3, 4, 5},
 		}
 		var b bytes.Buffer
@@ -151,7 +151,7 @@ func TestDoubleArrayBuilder_WriteTo(t *testing.T) {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
 		b := NewDoubleArrayBuilder(nil)
-		if err := b.build(keys, values); err != nil {
+		if err := b.Build(keys, values); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 		fp, err := ioutil.TempFile("", "da_write_to_test")

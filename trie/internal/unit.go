@@ -1,10 +1,10 @@
-package trie
+package internal
 
 import (
 	"fmt"
 )
 
-const MaxOffset = 1 << 29
+const maxOffset = 1 << 29
 
 type unit uint32
 
@@ -25,7 +25,7 @@ func (u *unit) setLabel(label byte) {
 }
 
 func (u *unit) setOffset(offset uint32) error {
-	if offset >= MaxOffset {
+	if offset >= maxOffset {
 		return fmt.Errorf("failed to modify unit, too large offset")
 	}
 	*u = unit(uint32(*u) & ((1 << 31) | (1 << 8) | 0xFF))
