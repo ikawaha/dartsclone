@@ -15,6 +15,8 @@ func Open(name string) (Trie, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
+
 	var length int64
 	if err := binary.Read(f, binary.LittleEndian, &length); err != nil {
 		return nil, fmt.Errorf("broken header, %v", err)

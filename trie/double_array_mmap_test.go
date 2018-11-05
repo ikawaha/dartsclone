@@ -23,7 +23,7 @@ func TestMmapedDoubleArray_ExactMatchSearch(t *testing.T) {
 		builder.build(keys, nil)
 		var b bytes.Buffer
 		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{raw: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
 		for i, v := range keys {
 			id, size, err := mmaped.ExactMatchSearch(v)
 			if err != nil {
@@ -43,7 +43,7 @@ func TestMmapedDoubleArray_ExactMatchSearch(t *testing.T) {
 		builder.build(keys, ids)
 		var b bytes.Buffer
 		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{raw: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
 		for i, v := range keys {
 			id, size, err := mmaped.ExactMatchSearch(v)
 			if err != nil {
@@ -71,7 +71,7 @@ func TestMmapedDoubleArray_CommonPrefixSearch(t *testing.T) {
 		builder.build(keys, nil)
 		var b bytes.Buffer
 		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{raw: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
 		ids, sizes, err := mmaped.CommonPrefixSearch("電気通信大学大学院大学", 0)
 		if err != nil {
 			t.Errorf("unexpected error, %v", err)
@@ -100,7 +100,7 @@ func TestMmapedDoubleArray_CommonPrefixSearchCallback(t *testing.T) {
 		builder.build(keys, nil)
 		var b bytes.Buffer
 		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{raw: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
 		var ids, sizes []int
 		mmaped.CommonPrefixSearchCallback("電気通信大学大学院大学", 0, func(id, size int) {
 			ids = append(ids, id)
@@ -127,6 +127,11 @@ func TestOpenMmap(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error, %v", err)
 		}
+		defer func() {
+			if err := trie.Close(); err != nil {
+				t.Errorf("unexpected error, %v", err)
+			}
+		}()
 		da, ok := trie.(*MmapedDoubleArray)
 		if !ok {
 			t.Fatalf("unexpected type, %T", trie)
@@ -146,6 +151,11 @@ func TestMmapedDoubleArray_At(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error, %v", err)
 	}
+	defer func() {
+		if err := trie.Close(); err != nil {
+			t.Errorf("unexpected error, %v", err)
+		}
+	}()
 	da, ok := trie.(*MmapedDoubleArray)
 	if !ok {
 		t.Fatalf("unexpected type, %T", trie)
