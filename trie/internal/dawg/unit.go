@@ -1,7 +1,7 @@
 package dawg
 
 const (
-	UnitSize = 32
+	unitSize = 32
 )
 
 type unit uint32

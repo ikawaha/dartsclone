@@ -7,7 +7,7 @@ import (
 
 func TestBitVector_Append(t *testing.T) {
 	var v bitVector
-	for i := 1; i <= UnitSize; i++ {
+	for i := 1; i <= unitSize; i++ {
 		v.append()
 		if expected, got := 1, len(v.units); expected != got {
 			t.Errorf("size of units: expected %v, got %v", expected, got)
@@ -20,7 +20,7 @@ func TestBitVector_Append(t *testing.T) {
 	if expected, got := 2, len(v.units); expected != got {
 		t.Errorf("expected %v, got %v", expected, got)
 	}
-	if expected, got := UnitSize+1, v.size; expected != got {
+	if expected, got := unitSize+1, v.size; expected != got {
 		t.Errorf("size: expected %v, got %v", expected, got)
 	}
 }
@@ -58,7 +58,7 @@ func TestBitVector_Set(t *testing.T) {
 		t.Errorf("[0...00]: expected %v, got %v", expected, got)
 	}
 
-	if err := v.set(UnitSize, true); err != nil {
+	if err := v.set(unitSize, true); err != nil {
 		t.Errorf("unexpected error, %v", err)
 	}
 	if expected, got := 1, v.units[1]; expected != int(got) {
@@ -105,11 +105,11 @@ func TestBitVector_Get(t *testing.T) {
 	var v bitVector
 	v.units = []uint32{0, 0}
 
-	if _, err := v.get(UnitSize * 2); err == nil {
+	if _, err := v.get(unitSize * 2); err == nil {
 		t.Error("expected index out of bounds error")
 	}
 
-	for i := range []uint32{1, 3, 5, 7, 9, UnitSize, UnitSize + 1, UnitSize + 2} {
+	for i := range []uint32{1, 3, 5, 7, 9, unitSize, unitSize + 1, unitSize + 2} {
 		if v, err := v.get(uint32(i)); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		} else if v {
@@ -117,7 +117,7 @@ func TestBitVector_Get(t *testing.T) {
 		}
 	}
 
-	for i := range []int{1, 3, 5, 7, 9, UnitSize, UnitSize + 1, UnitSize + 2} {
+	for i := range []int{1, 3, 5, 7, 9, unitSize, unitSize + 1, unitSize + 2} {
 		if err := v.set(i, true); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
@@ -131,7 +131,7 @@ func TestBitVector_Get(t *testing.T) {
 
 func TestBitVector_Build(t *testing.T) {
 	var v bitVector
-	for i := 0; i <= UnitSize*2; i++ {
+	for i := 0; i <= unitSize*2; i++ {
 		v.append()
 		if err := v.set(i, true); err != nil {
 			t.Errorf("unexpected error, %v", err)
@@ -151,7 +151,7 @@ func TestBitVector_Build(t *testing.T) {
 
 func TestBitVector_Rank(t *testing.T) {
 	var v bitVector
-	for i := 0; i <= UnitSize*2; i++ {
+	for i := 0; i <= unitSize*2; i++ {
 		v.append()
 		if err := v.set(i, true); err != nil {
 			t.Errorf("unexpected error, %v", err)
@@ -159,10 +159,10 @@ func TestBitVector_Rank(t *testing.T) {
 	}
 	v.finish()
 
-	if _, err := v.rank(UnitSize * 3); err == nil {
+	if _, err := v.rank(unitSize * 3); err == nil {
 		t.Error("expected index out of bounds error")
 	}
-	for i := 0; i <= UnitSize*2; i++ {
+	for i := 0; i <= unitSize*2; i++ {
 		if v, err := v.rank(uint32(i)); err != nil {
 			t.Errorf("unexpected error, %v", v)
 		} else if i+1 != v {

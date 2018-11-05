@@ -4,8 +4,9 @@ import (
 	"fmt"
 )
 
-const InitialTableSize = 1 << 10
+const initialTableSize = 1 << 10
 
+// Builder represents the structure of Directed Acyclic Word Graph builder.
 type Builder struct {
 	Graph
 	nodes      []node
@@ -15,6 +16,7 @@ type Builder struct {
 	numStates  int
 }
 
+// NewBuilder returns a DAWG builder.
 func NewBuilder() *Builder {
 	ret := Builder{}
 	ret.init()
@@ -30,6 +32,7 @@ func (b *Builder) init() {
 	b.nodeStack.push(0)
 }
 
+// Finish finishes a building DAWG.
 func (b *Builder) Finish() (*Graph, error) {
 	if err := b.flush(0); err != nil {
 		return nil, fmt.Errorf("builder flush, %v", err)
@@ -45,6 +48,7 @@ func (b *Builder) Finish() (*Graph, error) {
 	return &b.Graph, nil
 }
 
+// Insert inserts the word and the value to a DAWG.
 func (b *Builder) Insert(key string, value uint32) error {
 	if len(key) == 0 {
 		return fmt.Errorf("zero-length key")

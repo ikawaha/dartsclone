@@ -133,7 +133,7 @@ func TestGraph_Size(t *testing.T) {
 
 func TestGraph_IntersectionID(t *testing.T) {
 	var v bitVector
-	for i := 0; i <= UnitSize*2; i++ {
+	for i := 0; i <= unitSize*2; i++ {
 		v.append()
 		if err := v.set(i, true); err != nil {
 			t.Errorf("unexpected error, %v", err)
@@ -151,7 +151,7 @@ func TestGraph_IntersectionID(t *testing.T) {
 
 func TestGraph_IsIntersection(t *testing.T) {
 	var v bitVector
-	for i := 0; i <= UnitSize*2; i++ {
+	for i := 0; i <= unitSize*2; i++ {
 		v.append()
 		if err := v.set(i, i%2 == 0); err != nil {
 			t.Errorf("unexpected error, %v", err)
@@ -179,7 +179,7 @@ func TestGraph_IsIntersection(t *testing.T) {
 
 func TestGraph_NumIntersections(t *testing.T) {
 	var v bitVector
-	for i := 0; i <= UnitSize*2; i++ {
+	for i := 0; i <= unitSize*2; i++ {
 		v.append()
 		if err := v.set(i, true); err != nil {
 			t.Errorf("unexpected error, %v", err)
@@ -189,7 +189,7 @@ func TestGraph_NumIntersections(t *testing.T) {
 
 	g := Graph{isIntersections: v}
 
-	if got, expected := g.NumIntersections(), UnitSize*2+1; got != expected {
+	if got, expected := g.NumIntersections(), unitSize*2+1; got != expected {
 		t.Errorf("expected %v, got %v", expected, got)
 	}
 }
