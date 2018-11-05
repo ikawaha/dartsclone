@@ -24,7 +24,7 @@ type extraUnit struct {
 	isUsed  bool
 }
 
-// DoubleArrayBuilder represents the builder for a double array.
+// DoubleArrayBuilder represents the builder of the double array.
 type DoubleArrayBuilder struct {
 	units      []unit
 	extras     []extraUnit
@@ -45,7 +45,7 @@ func BuildDoubleArray(keys []string, values []uint32, progress ProgressFunction)
 	return &DoubleArrayUint32{array: b.toArray()}, nil
 }
 
-// NewDoubleArrayBuilder returns a builder for a double array with progress function.
+// NewDoubleArrayBuilder returns a builder of the double array with progress function.
 // The parameter progress sets nil if no progress bar.
 func NewDoubleArrayBuilder(progress ProgressFunction) *DoubleArrayBuilder {
 	return &DoubleArrayBuilder{
@@ -83,7 +83,7 @@ func (b DoubleArrayBuilder) toArray() []uint32 {
 	return ret
 }
 
-// WriteTo dumps serialize data of a double array.
+// WriteTo write to the serialize data of the double array.
 func (b DoubleArrayBuilder) WriteTo(w io.Writer) (int64, error) {
 	var size int64
 	x := int64(len(b.units) * 4) // size * uint32

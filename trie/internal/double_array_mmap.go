@@ -21,6 +21,7 @@ type MmapedDoubleArray struct {
 	r   *bytes.Reader
 }
 
+// OpenMmaped opens the named file of double array and maps it on the memory.
 func OpenMmaped(name string) (*MmapedDoubleArray, error) {
 	f, err := os.Open(name)
 	if err != nil {

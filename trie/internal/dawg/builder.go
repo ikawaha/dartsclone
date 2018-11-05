@@ -24,7 +24,7 @@ func NewBuilder() *Builder {
 }
 
 func (b *Builder) init() {
-	b.table = make([]int, InitialTableSize)
+	b.table = make([]int, initialTableSize)
 	b.appendNode()
 	b.appendUnit()
 	b.numStates = 1

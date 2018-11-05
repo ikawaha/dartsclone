@@ -10,6 +10,7 @@ type DoubleArrayUint32 struct {
 	array []uint32
 }
 
+// Open opens the named file of the double array.
 func Open(name string) (*DoubleArrayUint32, error) {
 	f, err := os.Open(name)
 	if err != nil {

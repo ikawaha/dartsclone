@@ -14,7 +14,7 @@ type Trie interface {
 	CommonPrefixSearchCallback(key string, offset int, callback func(id, size int)) error
 }
 
-// Open opens the named file of double array.
+// Open opens the named file of the double array.
 func Open(name string) (Trie, error) {
 	return internal.Open(name)
 }

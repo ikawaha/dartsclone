@@ -13,7 +13,7 @@ type MmapedTrie interface {
 	Close() error
 }
 
-// OpenMmaped opens the named file of double array and maps it on the memory.
+// OpenMmaped opens the named file of the double array and maps it on the memory.
 func OpenMmaped(name string) (MmapedTrie, error) {
 	return internal.OpenMmaped(name)
 }

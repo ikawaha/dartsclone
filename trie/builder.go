@@ -11,19 +11,19 @@ func BuildDoubleArray(keys []string, values []uint32, progress ProgressFunction)
 	return internal.BuildDoubleArray(keys, values, progress)
 }
 
-// DoubleArrayBuilder represents builder for double array.
+// DoubleArrayBuilder represents builder of the double array.
 type DoubleArrayBuilder struct {
 	*internal.DoubleArrayBuilder
 }
 
-// NewDoubleArrayBuilder creates a builder of double array.
+// NewDoubleArrayBuilder creates a builder of the double array.
 func NewDoubleArrayBuilder(progress ProgressFunction) *DoubleArrayBuilder {
 	return &DoubleArrayBuilder{
 		DoubleArrayBuilder: internal.NewDoubleArrayBuilder(progress),
 	}
 }
 
-// WriteTo dumps double array.
+// WriteTo write to the serialize data of the double array.
 func (b DoubleArrayBuilder) WriteTo(w io.Writer) (int64, error) {
 	return b.DoubleArrayBuilder.WriteTo(w)
 }
