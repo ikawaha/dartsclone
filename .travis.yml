@@ -1,0 +1,39 @@
+language: go
+
+go:
+  - "1.9.x"
+  - "1.10.x"
+  - "1.11.x"
+  - tip
+
+sudo: false
+cache: bundler
+
+git:
+  depth: 1
+
+os:
+- linux
+- osx
+
+before_install:
+  - pip install --user codecov
+  - go get github.com/axw/gocov/gocov
+  - go get github.com/mattn/goveralls
+  - go get golang.org/x/tools/cmd/cover
+
+install:
+
+script:
+  - go vet -tags mmap ./...
+  - go test -tags mmap ./...
+
+after_success:
+  - |
+    if [[ $TRAVIS_GO_VERSION = 1.11.x ]] && [[ $TRAVIS_OS_NAME = linux ]]
+    then
+      go test -tags mmap -covermode=count -coverprofile=coverage.txt ./...
+      $GOPATH/bin/goveralls -coverprofile=coverage.txt -service=travis-ci
+    else
+      echo skip coverage test, $TRAVIS_GO_VERSION, $TRAVIS_OS_NAME
+    fi
