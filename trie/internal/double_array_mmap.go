@@ -15,6 +15,7 @@ const (
 	MmapedFileHeaderSize = 8
 )
 
+// MmapedDoubleArray represents the TRIE data structure mapped on the virtual memory address.
 type MmapedDoubleArray struct {
 	f   *os.File
 	raw []byte

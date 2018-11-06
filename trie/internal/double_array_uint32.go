@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// DoubleArrayUint32 represents the TRIE data structure.
 type DoubleArrayUint32 struct {
 	array []uint32
 }
