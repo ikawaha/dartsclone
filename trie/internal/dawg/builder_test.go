@@ -154,3 +154,40 @@ func TestDAWGBuilder_Finish(t *testing.T) {
 		t.Errorf("graph size: expected %v, got %v", expected, got)
 	}
 }
+
+func TestBuilder_ExpandTable(t *testing.T) {
+	t.Run("empty units", func(t *testing.T) {
+		b := NewBuilder()
+		b.expandTable()
+		if got, expected := len(b.table), initialTableSize<<1; got != expected {
+			t.Errorf("expected %v, got %v", expected, got)
+		}
+		for i, v := range b.table {
+			if v != 0 {
+				t.Errorf("unexpected value !=0, %v (%v)", v, i)
+			}
+		}
+	})
+	t.Run("has units", func(t *testing.T) {
+		b := NewBuilder()
+		value0UnitSize := 10
+		for i := 0; i < value0UnitSize; i++ {
+			b.units = append(b.units, unit(2)) // isState=true
+			b.labels = append(b.labels, 0)
+		}
+		b.expandTable()
+		if got, expected := len(b.table), initialTableSize<<1; got != expected {
+			t.Errorf("expected %v, got %v", expected, got)
+		}
+		ii := []int{}
+		for i, v := range b.table {
+			if v != 0 {
+				ii = append(ii, i)
+			}
+		}
+		if got, expected := len(ii), value0UnitSize; got != expected {
+			t.Errorf("expected %v, got %v, indexes %+v", expected, got, ii)
+		}
+	})
+
+}

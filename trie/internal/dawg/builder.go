@@ -181,15 +181,13 @@ func (b *Builder) expandTable() {
 	b.table = make([]int, tableSize)
 	for id := 1; id < len(b.units); id++ {
 		if b.labels[id] == 0 || b.units[id].isState() {
-			findResult := b.findUnit(id)
-			hashID := findResult[1]
+			hashID := b.findUnit(id)
 			b.table[hashID] = id
 		}
 	}
 }
 
-func (b *Builder) findUnit(id int) [2]int {
-	result := [2]int{}
+func (b *Builder) findUnit(id int) int {
 	hashID := b.hashUnit(id) % len(b.table)
 	for {
 		unitID := b.table[hashID]
@@ -198,8 +196,7 @@ func (b *Builder) findUnit(id int) [2]int {
 		}
 		hashID = (hashID + 1) % len(b.table)
 	}
-	result[1] = hashID
-	return result
+	return hashID
 }
 
 func (b *Builder) findNode(nodeID int) (matchID, hashID int) {
