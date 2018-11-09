@@ -16,6 +16,9 @@ os:
 - linux
 - osx
 
+env:
+- GO111MODULE=on
+
 before_install:
   - pip install --user codecov
   - go get github.com/axw/gocov/gocov
