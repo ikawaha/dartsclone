@@ -27,6 +27,7 @@ install:
 script:
   - go vet -tags mmap ./...
   - go test -tags mmap ./...
+  - cd trie; go test -tags mmap -benchmem -bench .; cd ..
 
 after_success:
   - |

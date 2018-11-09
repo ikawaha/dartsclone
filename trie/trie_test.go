@@ -1,3 +1,17 @@
+// Copyright 2018 ikawaha
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// 	You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package trie
 
 import (
@@ -50,31 +64,6 @@ func BenchmarkTrie(b *testing.B) {
 	})
 	b.Run("dartsclone", func(b *testing.B) {
 		da, err := Open("./internal/_testdata/da_keys")
-		if err != nil {
-			b.Fatalf("unexpected error, dartsclone open, %v", err)
-		}
-		b.Run("exact match search", func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range keys {
-					if id, _, err := da.ExactMatchSearch(v); id < 0 || err != nil {
-						b.Fatalf("unexpected error, missing a keyword %v, id=%v, err=%v", v, id, err)
-					}
-				}
-			}
-		})
-		b.Run("common prefix match search", func(b *testing.B) {
-			for i := 0; i < b.N; i++ {
-				for _, v := range keys {
-					if ids, _, err := da.CommonPrefixSearch(v, 0); len(ids) == 0 || err != nil {
-						b.Fatalf("unexpected error, missing a keyword %v, err=%v", v, err)
-					}
-				}
-			}
-		})
-	})
-	b.Run("dartsclone mmap", func(b *testing.B) {
-		da, err := OpenMmaped("./internal/_testdata/da_keys")
-		defer da.Close()
 		if err != nil {
 			b.Fatalf("unexpected error, dartsclone open, %v", err)
 		}
