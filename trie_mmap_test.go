@@ -14,7 +14,7 @@
 
 // +build mmap
 
-package trie
+package dartsclone
 
 import (
 	"bufio"

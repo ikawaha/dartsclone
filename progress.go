@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package trie
+package dartsclone
 
 // ProgressFunction indicates progress bar of building a double array.
 type ProgressFunction interface {

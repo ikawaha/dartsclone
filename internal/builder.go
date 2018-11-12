@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"io"
 
-	"github.com/ikawaha/dartsclone/trie/internal/dawg"
+	"github.com/ikawaha/dartsclone/internal"
 )
 
 const (

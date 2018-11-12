@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package trie
+package dartsclone
 
 import (
-	"github.com/ikawaha/dartsclone/trie/internal"
+	"github.com/ikawaha/dartsclone/internal"
 )
 
 // Trie is the TRIE interface.
