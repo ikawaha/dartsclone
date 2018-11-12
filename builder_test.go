@@ -21,7 +21,7 @@ import (
 	"testing"
 )
 
-func TestNewDoubleArrayBuilder(t *testing.T) {
+func TestNewBuilder(t *testing.T) {
 	t.Run("w/ values", func(t *testing.T) {
 		f, err := os.Open("./internal/_testdata/keys.txt")
 		if err != nil {
@@ -39,7 +39,7 @@ func TestNewDoubleArrayBuilder(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
-		b := NewDoubleArrayBuilder(nil)
+		b := NewBuilder(nil)
 		if err := b.Build(keys, values); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
@@ -57,14 +57,14 @@ func TestNewDoubleArrayBuilder(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
-		b := NewDoubleArrayBuilder(nil)
+		b := NewBuilder(nil)
 		if err := b.Build(keys, nil); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 	})
 }
 
-func TestDoubleArrayBuilder_WriteTo(t *testing.T) {
+func TestBuilder_WriteTo(t *testing.T) {
 	t.Run("build from keys.txt and write to file", func(t *testing.T) {
 		f, err := os.Open("./internal/_testdata/keys.txt")
 		if err != nil {
@@ -82,7 +82,7 @@ func TestDoubleArrayBuilder_WriteTo(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
-		b := NewDoubleArrayBuilder(nil)
+		b := NewBuilder(nil)
 		if err := b.Build(keys, values); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
@@ -97,7 +97,7 @@ func TestDoubleArrayBuilder_WriteTo(t *testing.T) {
 	})
 }
 
-func TestBuildDoubleArray(t *testing.T) {
+func TestBuildTRIE(t *testing.T) {
 	keys := []string{
 		"電気",
 		"電気通信",
@@ -106,12 +106,12 @@ func TestBuildDoubleArray(t *testing.T) {
 		"電気通信大学大学院大学",
 	}
 	t.Run("build", func(t *testing.T) {
-		a, err := BuildDoubleArray(keys, nil, nil)
+		trie, err := BuildTRIE(keys, nil, nil)
 		if err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
 		t.Run("check", func(t *testing.T) {
-			ids, sizes, err := a.CommonPrefixSearch("電気通信大学大学院大学", 0)
+			ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
 			if err != nil {
 				t.Errorf("unexpected error, %v", err)
 			}

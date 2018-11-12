@@ -15,7 +15,7 @@ package main
 import (
 	"os"
 
-	"github.com/ikawaha/dartsclone/trie"
+	"github.com/ikawaha/dartsclone"
 )
 
 func main() {
@@ -28,7 +28,7 @@ func main() {
 	}
 
 	// Build
-	builder := trie.NewDoubleArrayBuilder(nil)
+	builder := dartsclone.NewBuilder(nil)
 	if err := builder.Build(keys, nil); err != nil {
 		panic(err)
 	}
@@ -49,15 +49,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/ikawaha/dartsclone/trie"
+	"github.com/ikawaha/dartsclone"
 )
 
 func main() {
-	da, err := trie.Open("my-double-array-file")
+	trie, err := dartsclone.Open("my-double-array-file")
 	if err != nil {
 		panic(err)
 	}
-	ids, sizes, err := da.CommonPrefixSearch("電気通信大学大学院大学", 0)
+	ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
 	for i := 0; i < len(ids); i++ {
 		fmt.Printf("id=%d, common prefix=%s\n", ids[i], "電気通信大学大学院大学"[0:sizes[i]])
 	}
@@ -86,17 +86,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/ikawaha/dartsclone/trie"
+	"github.com/ikawaha/dartsclone"
 )
 
 func main() {
-	da, err := trie.OpenMmaped("my-double-array-file") // ← ★
+	trie, err := dartsclone.OpenMmaped("my-double-array-file") // ← ★
 	if err != nil {
 		panic(err)
 	}
-	defer da.Close() // ← ★
+	defer trie.Close() // ← ★
 
-	ids, sizes, err := da.CommonPrefixSearch("電気通信大学大学院大学", 0)
+	ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
 	for i := 0; i < len(ids); i++ {
 		fmt.Printf("id=%d, common prefix=%s\n", ids[i], "電気通信大学大学院大学"[0:sizes[i]])
 	}
