@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package trie
+package dartsclone
 
 import (
 	"bufio"
@@ -23,7 +23,7 @@ import (
 	"github.com/ikawaha/da"
 )
 
-func BenchmarkTrie(b *testing.B) {
+func BenchmarkTRIE(b *testing.B) {
 	f, err := os.Open("./internal/_testdata/keys.txt")
 	if err != nil {
 		b.Fatalf("unexpected open file error, %v", err)
@@ -63,14 +63,14 @@ func BenchmarkTrie(b *testing.B) {
 		})
 	})
 	b.Run("dartsclone", func(b *testing.B) {
-		da, err := Open("./internal/_testdata/da_keys")
+		trie, err := Open("./internal/_testdata/da_keys")
 		if err != nil {
 			b.Fatalf("unexpected error, dartsclone open, %v", err)
 		}
 		b.Run("exact match search", func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for _, v := range keys {
-					if id, _, err := da.ExactMatchSearch(v); id < 0 || err != nil {
+					if id, _, err := trie.ExactMatchSearch(v); id < 0 || err != nil {
 						b.Fatalf("unexpected error, missing a keyword %v, id=%v, err=%v", v, id, err)
 					}
 				}
@@ -79,7 +79,7 @@ func BenchmarkTrie(b *testing.B) {
 		b.Run("common prefix match search", func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for _, v := range keys {
-					if ids, _, err := da.CommonPrefixSearch(v, 0); len(ids) == 0 || err != nil {
+					if ids, _, err := trie.CommonPrefixSearch(v, 0); len(ids) == 0 || err != nil {
 						b.Fatalf("unexpected error, missing a keyword %v, err=%v", v, err)
 					}
 				}

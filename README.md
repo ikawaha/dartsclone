@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/ikawaha/dartsclone.svg?branch=master)](https://travis-ci.org/ikawaha/dartsclone)
 [![Build status](https://ci.appveyor.com/api/projects/status/2ku3oes7oe7nlw2x/branch/master?svg=true)](https://ci.appveyor.com/project/ikawaha/dartsclone/branch/master)
 [![Coverage Status](https://coveralls.io/repos/github/ikawaha/dartsclone/badge.svg)](https://coveralls.io/github/ikawaha/dartsclone)
+[![GoDoc](https://godoc.org/github.com/ikawaha/dartsclone?status.svg)](https://godoc.org/github.com/ikawaha/dartsclone)
 
 Port of [Sudachi's dartsclone library](https://github.com/WorksApplications/Sudachi/tree/develop/src/main/java/com/worksap/nlp/dartsclone) to Go. 
 
@@ -15,7 +16,7 @@ package main
 import (
 	"os"
 
-	"github.com/ikawaha/dartsclone/trie"
+	"github.com/ikawaha/dartsclone"
 )
 
 func main() {
@@ -28,7 +29,7 @@ func main() {
 	}
 
 	// Build
-	builder := trie.NewDoubleArrayBuilder(nil)
+	builder := dartsclone.NewBuilder(nil)
 	if err := builder.Build(keys, nil); err != nil {
 		panic(err)
 	}
@@ -49,15 +50,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/ikawaha/dartsclone/trie"
+	"github.com/ikawaha/dartsclone"
 )
 
 func main() {
-	da, err := trie.Open("my-double-array-file")
+	trie, err := dartsclone.Open("my-double-array-file")
 	if err != nil {
 		panic(err)
 	}
-	ids, sizes, err := da.CommonPrefixSearch("電気通信大学大学院大学", 0)
+	ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
 	for i := 0; i < len(ids); i++ {
 		fmt.Printf("id=%d, common prefix=%s\n", ids[i], "電気通信大学大学院大学"[0:sizes[i]])
 	}
@@ -86,17 +87,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/ikawaha/dartsclone/trie"
+	"github.com/ikawaha/dartsclone"
 )
 
 func main() {
-	da, err := trie.OpenMmaped("my-double-array-file") // ← ★
+	trie, err := dartsclone.OpenMmaped("my-double-array-file") // ← ★
 	if err != nil {
 		panic(err)
 	}
-	defer da.Close() // ← ★
+	defer trie.Close() // ← ★
 
-	ids, sizes, err := da.CommonPrefixSearch("電気通信大学大学院大学", 0)
+	ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
 	for i := 0; i < len(ids); i++ {
 		fmt.Printf("id=%d, common prefix=%s\n", ids[i], "電気通信大学大学院大学"[0:sizes[i]])
 	}

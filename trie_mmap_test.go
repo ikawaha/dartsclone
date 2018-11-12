@@ -14,7 +14,7 @@
 
 // +build mmap
 
-package trie
+package dartsclone
 
 import (
 	"bufio"
@@ -22,7 +22,7 @@ import (
 	"testing"
 )
 
-func BenchmarkTrieMmaped(b *testing.B) {
+func BenchmarkTRIEMmaped(b *testing.B) {
 	f, err := os.Open("./internal/_testdata/keys.txt")
 	if err != nil {
 		b.Fatalf("unexpected open file error, %v", err)
@@ -36,15 +36,15 @@ func BenchmarkTrieMmaped(b *testing.B) {
 		b.Fatalf("unexpected scanner error, %v", err)
 	}
 
-	da, err := OpenMmaped("./internal/_testdata/da_keys")
-	defer da.Close()
+	trie, err := OpenMmaped("./internal/_testdata/da_keys")
+	defer trie.Close()
 	if err != nil {
 		b.Fatalf("unexpected error, dartsclone open, %v", err)
 	}
 	b.Run("exact match search", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			for _, v := range keys {
-				if id, _, err := da.ExactMatchSearch(v); id < 0 || err != nil {
+				if id, _, err := trie.ExactMatchSearch(v); id < 0 || err != nil {
 					b.Fatalf("unexpected error, missing a keyword %v, id=%v, err=%v", v, id, err)
 				}
 			}
@@ -53,7 +53,7 @@ func BenchmarkTrieMmaped(b *testing.B) {
 	b.Run("common prefix match search", func(b *testing.B) {
 		for i := 0; i < b.N; i++ {
 			for _, v := range keys {
-				if ids, _, err := da.CommonPrefixSearch(v, 0); len(ids) == 0 || err != nil {
+				if ids, _, err := trie.CommonPrefixSearch(v, 0); len(ids) == 0 || err != nil {
 					b.Fatalf("unexpected error, missing a keyword %v, err=%v", v, err)
 				}
 			}

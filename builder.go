@@ -12,32 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package trie
+package dartsclone
 
 import (
 	"io"
 
-	"github.com/ikawaha/dartsclone/trie/internal"
+	"github.com/ikawaha/dartsclone/internal"
 )
 
-// BuildDoubleArray returns a double array trie for keys and values.
-func BuildDoubleArray(keys []string, values []uint32, progress ProgressFunction) (Trie, error) {
+// BuildTRIE returns a dartsclone TRIE for keys and values.
+func BuildTRIE(keys []string, values []uint32, progress ProgressFunction) (Trie, error) {
 	return internal.BuildDoubleArray(keys, values, progress)
 }
 
-// DoubleArrayBuilder represents builder of the double array.
-type DoubleArrayBuilder struct {
+// Builder represents builder of the dartsclone TRIE.
+type Builder struct {
 	*internal.DoubleArrayBuilder
 }
 
-// NewDoubleArrayBuilder creates a builder of the double array.
-func NewDoubleArrayBuilder(progress ProgressFunction) *DoubleArrayBuilder {
-	return &DoubleArrayBuilder{
+// NewBuilder creates a builder of the dartsclone TRIE.
+func NewBuilder(progress ProgressFunction) *Builder {
+	return &Builder{
 		DoubleArrayBuilder: internal.NewDoubleArrayBuilder(progress),
 	}
 }
 
-// WriteTo write to the serialize data of the double array.
-func (b DoubleArrayBuilder) WriteTo(w io.Writer) (int64, error) {
+// WriteTo write to the serialize data of the dartsclone TRIE.
+func (b Builder) WriteTo(w io.Writer) (int64, error) {
 	return b.DoubleArrayBuilder.WriteTo(w)
 }

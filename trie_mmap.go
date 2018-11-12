@@ -14,10 +14,10 @@
 
 // +build mmap
 
-package trie
+package dartsclone
 
 import (
-	"github.com/ikawaha/dartsclone/trie/internal"
+	"github.com/ikawaha/dartsclone/internal"
 )
 
 // MmapedTrie is the TRIE interface.
