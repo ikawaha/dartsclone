@@ -79,8 +79,12 @@ id=4, common prefix=電気通信大学大学院大学
 ## Use memory mapping
 
 * Build Tags : mmap
-* Support OS : linux, osx
+* Support OS : linux, osx, windows
 
+
+```
+$ go build -tags mmap ./...
+```
 
 ```Go:
 package main
