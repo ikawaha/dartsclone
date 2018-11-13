@@ -18,18 +18,22 @@ import (
 	progressbar "github.com/schollz/progressbar/v2"
 )
 
+// ProgressBar represents a progress bar that implements ProgressFunction interface.
 type ProgressBar struct {
 	*progressbar.ProgressBar
 }
 
+// New create a progress bar.
 func New() *ProgressBar {
 	return &ProgressBar{}
 }
 
+// SetMaximum sets the maximum of the progress bar.
 func (p *ProgressBar) SetMaximum(max int) {
 	p.ProgressBar = progressbar.New(max)
 }
 
+// Increment with increase the current count on the progress bar.
 func (p *ProgressBar) Increment() {
 	if p.ProgressBar != nil {
 		p.Add(1)
