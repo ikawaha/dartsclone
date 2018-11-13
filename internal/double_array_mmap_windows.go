@@ -55,12 +55,12 @@ func openMmap(f *os.File, offset, length int) (*MmapedDoubleArray, error) {
 		return nil, fmt.Errorf("offset parameter must be a multiple of the system's page size")
 	}
 	low, high := uint32(length), uint32(length>>32)
-	fmap, err := syscall.CreateFileMapping(syscall.Handle(f.Fd()), nil, syscall.PAGE_READONLY, high, low, nil)
+	fm, err := syscall.CreateFileMapping(syscall.Handle(f.Fd()), nil, syscall.PAGE_READONLY, high, low, nil)
 	if err != nil {
 		return nil, err
 	}
-	defer syscall.CloseHandle(fmap)
-	ptr, err := syscall.MapViewOfFile(fmap, syscall.FILE_MAP_READ, 0, 0, uintptr(length))
+	defer syscall.CloseHandle(fm)
+	ptr, err := syscall.MapViewOfFile(fm, syscall.FILE_MAP_READ, 0, 0, uintptr(length))
 	if err != nil {
 		return nil, err
 	}
