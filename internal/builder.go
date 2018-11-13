@@ -79,6 +79,9 @@ func (b *DoubleArrayBuilder) Build(keys []string, values []uint32) error {
 		}
 		return nil
 	}
+	if b.progress != nil {
+		b.progress.SetMaximum(keySet.Len())
+	}
 	g, err := b.buildDAWG(keySet)
 	if err != nil {
 		return fmt.Errorf("build DAWG, %v", err)
@@ -139,7 +142,7 @@ func (b DoubleArrayBuilder) buildDAWG(keySet *keySet) (*dawg.Graph, error) {
 
 		// progress bar
 		if b.progress != nil {
-			b.progress.Increment(1)
+			b.progress.Increment()
 		}
 	}
 	g, err := dawgBuilder.Finish()
@@ -386,7 +389,7 @@ func (b *DoubleArrayBuilder) arrangeFromKeySet(keySet *keySet, begin, end, depth
 			}
 			// progress bar
 			if b.progress != nil {
-				b.progress.Increment(1)
+				b.progress.Increment()
 			}
 		}
 		if len(b.labels) == 0 {

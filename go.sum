@@ -1,2 +1,6 @@
 github.com/ikawaha/da v0.0.0-20141126165404-5556b9e515ca h1:Ye8wDuFVpINaiKj26eAOwmqBAWDEEVdhgEtyUCfUMw8=
 github.com/ikawaha/da v0.0.0-20141126165404-5556b9e515ca/go.mod h1:JZfcL9+WaPkxDS7OBk09o8VkkV7YYI9yLQG610HxZds=
+github.com/mitchellh/colorstring v0.0.0-20150917214807-8631ce90f286 h1:KHyL+3mQOF9sPfs26lsefckcFNDcIZtiACQiECzIUkw=
+github.com/mitchellh/colorstring v0.0.0-20150917214807-8631ce90f286/go.mod h1:l0dey0ia/Uv7NcFFVbCLtqEBQbrT4OCwCSKTEv6enCw=
+github.com/schollz/progressbar/v2 v2.7.1 h1:wEojKO9r+zgGEEgJSsu7QcVAM0NeEP64Ad4lHK12A5A=
+github.com/schollz/progressbar/v2 v2.7.1/go.mod h1:l6tn6yU6ZdQoF8lwX/VoAUQ3FjhCbrcZDnl9xeWZzYw=
