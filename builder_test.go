@@ -19,6 +19,8 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+
+	"github.com/ikawaha/dartsclone/progressbar"
 )
 
 func TestNewBuilder(t *testing.T) {
@@ -39,7 +41,7 @@ func TestNewBuilder(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
-		b := NewBuilder(nil)
+		b := NewBuilder(progressbar.New())
 		if err := b.Build(keys, values); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
@@ -57,7 +59,7 @@ func TestNewBuilder(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
-		b := NewBuilder(nil)
+		b := NewBuilder(progressbar.New())
 		if err := b.Build(keys, nil); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
@@ -82,7 +84,7 @@ func TestBuilder_WriteTo(t *testing.T) {
 		if err := scanner.Err(); err != nil {
 			t.Errorf("unexpected scanner error, %v", err)
 		}
-		b := NewBuilder(nil)
+		b := NewBuilder(progressbar.New())
 		if err := b.Build(keys, values); err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
@@ -106,7 +108,7 @@ func TestBuildTRIE(t *testing.T) {
 		"電気通信大学大学院大学",
 	}
 	t.Run("build", func(t *testing.T) {
-		trie, err := BuildTRIE(keys, nil, nil)
+		trie, err := BuildTRIE(keys, nil, progressbar.New())
 		if err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}

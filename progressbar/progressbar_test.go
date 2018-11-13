@@ -12,12 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dartsclone
+package progressbar
 
-// ProgressFunction indicates progress bar of building double array.
-type ProgressFunction interface {
-	// SetMaximum sets the maximum of the progress bar.
-	SetMaximum(int)
-	// Increment with increase the current count on the progress bar.
-	Increment()
+import (
+	"testing"
+)
+
+func TestProgressBar(t *testing.T) {
+	p := New()
+	if p.ProgressBar != nil {
+		t.Error("unexpected not nil")
+	}
+	t.Run("increments before SetMaximum()", func(t *testing.T) {
+		p.Increment()
+		p.Increment()
+	})
+	t.Run("set maximum", func(t *testing.T) {
+		p.SetMaximum(100)
+	})
+	t.Run("increments", func(t *testing.T) {
+		for i := 0; i < 100; i++ {
+			p.Increment()
+		}
+	})
+	t.Run("increments over maximum", func(t *testing.T) {
+		for i := 0; i < 10; i++ {
+			p.Increment()
+		}
+	})
 }

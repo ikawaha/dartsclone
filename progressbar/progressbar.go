@@ -12,12 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package dartsclone
+package progressbar
 
-// ProgressFunction indicates progress bar of building double array.
-type ProgressFunction interface {
-	// SetMaximum sets the maximum of the progress bar.
-	SetMaximum(int)
-	// Increment with increase the current count on the progress bar.
-	Increment()
+import (
+	progressbar "github.com/schollz/progressbar/v2"
+)
+
+type ProgressBar struct {
+	*progressbar.ProgressBar
+}
+
+func New() *ProgressBar {
+	return &ProgressBar{}
+}
+
+func (p *ProgressBar) SetMaximum(max int) {
+	p.ProgressBar = progressbar.New(max)
+}
+
+func (p *ProgressBar) Increment() {
+	if p.ProgressBar != nil {
+		p.Add(1)
+	}
 }
