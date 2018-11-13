@@ -22,7 +22,9 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"syscall"
+	"unsafe"
 )
 
 const (
@@ -31,7 +33,6 @@ const (
 
 // MmapedDoubleArray represents the TRIE data structure mapped on the virtual memory address.
 type MmapedDoubleArray struct {
-	f   *os.File
 	raw []byte
 	r   *bytes.Reader
 }
@@ -42,6 +43,7 @@ func OpenMmaped(name string) (*MmapedDoubleArray, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	var length int64
 	if err := binary.Read(f, binary.LittleEndian, &length); err != nil {
 		return nil, fmt.Errorf("broken header, %v", err)
@@ -53,18 +55,24 @@ func openMmap(f *os.File, offset, length int) (*MmapedDoubleArray, error) {
 	if int64(offset)%int64(os.Getpagesize()) != 0 {
 		return nil, fmt.Errorf("offset parameter must be a multiple of the system's page size")
 	}
-	b, err := syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_SHARED)
+	low, high := uint32(length), uint32(length>>32)
+	fm, err := syscall.CreateFileMapping(syscall.Handle(f.Fd()), nil, syscall.PAGE_READONLY, high, low, nil)
 	if err != nil {
-		b, err = syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_PRIVATE)
-		if err != nil {
-			return nil, fmt.Errorf("mmap error, %v", err)
-		}
+		return nil, err
 	}
-	return &MmapedDoubleArray{
-		f:   f,
+	defer syscall.CloseHandle(fm)
+	ptr, err := syscall.MapViewOfFile(fm, syscall.FILE_MAP_READ, 0, 0, uintptr(length))
+	if err != nil {
+		return nil, err
+	}
+	b := (*[maxBytes]byte)(unsafe.Pointer(ptr))[:length]
+
+	ret := &MmapedDoubleArray{
 		raw: b,
 		r:   bytes.NewReader(b[MmapedFileHeaderSize:]),
-	}, nil
+	}
+	runtime.SetFinalizer(ret, (*MmapedDoubleArray).Close)
+	return ret, nil
 }
 
 func (a MmapedDoubleArray) at(i uint32) (unit, error) {
@@ -94,9 +102,12 @@ func (a MmapedDoubleArray) CommonPrefixSearchCallback(key string, offset int, ca
 }
 
 // Close deletes the mapped memory and closes the opened file.
-func (a MmapedDoubleArray) Close() error {
-	if err := syscall.Munmap(a.raw); err != nil {
-		return fmt.Errorf("munmap error, %v", err)
+func (a *MmapedDoubleArray) Close() error {
+	if a.raw == nil {
+		return nil
 	}
-	return a.f.Close()
+	data := a.raw
+	a.raw = nil
+	runtime.SetFinalizer(a, nil)
+	return syscall.UnmapViewOfFile(uintptr(unsafe.Pointer(&data[0])))
 }
