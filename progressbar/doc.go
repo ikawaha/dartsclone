@@ -12,5 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package progress bar is a sample implementation of ProgressFunction interface.
+// Package progressbar is a sample implementation of ProgressFunction interface.
 package progressbar
