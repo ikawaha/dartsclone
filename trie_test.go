@@ -17,6 +17,7 @@ package dartsclone
 import (
 	"bufio"
 	"os"
+	"sort"
 	"strings"
 	"testing"
 
@@ -86,4 +87,37 @@ func BenchmarkTRIE(b *testing.B) {
 			}
 		})
 	})
+}
+
+func TestOpen(t *testing.T) {
+	f, err := os.Open("./internal/_testdata/keys.txt")
+	if err != nil {
+		t.Errorf("unexpected open file error, %v", err)
+	}
+	var keys []string
+	scanner := bufio.NewScanner(f)
+	for i := 0; scanner.Scan(); i++ {
+		keys = append(keys, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		t.Errorf("unexpected scanner error, %v", err)
+	}
+	sort.Strings(keys)
+
+	trie, err := Open("./internal/_testdata/da_keys")
+	if err != nil {
+		t.Fatalf("unexpected error, %v", err)
+	}
+	for i, key := range keys {
+		id, size, err := trie.ExactMatchSearch(key)
+		if err != nil {
+			t.Errorf("unexpected error, %v", err)
+		}
+		if expected := i; id != expected {
+			t.Errorf("id: expected %v, got %v", i, id)
+		}
+		if expected := len(key); size != expected {
+			t.Errorf("size: expected %v, got %v", i, id)
+		}
+	}
 }
