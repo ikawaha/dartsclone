@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"syscall"
 )
 
@@ -31,7 +32,6 @@ const (
 
 // MmapedDoubleArray represents the TRIE data structure mapped on the virtual memory address.
 type MmapedDoubleArray struct {
-	f   *os.File
 	raw []byte
 	r   *bytes.Reader
 }
@@ -42,6 +42,7 @@ func OpenMmaped(name string) (*MmapedDoubleArray, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 	var length int64
 	if err := binary.Read(f, binary.LittleEndian, &length); err != nil {
 		return nil, fmt.Errorf("broken header, %v", err)
@@ -55,16 +56,15 @@ func openMmap(f *os.File, offset, length int) (*MmapedDoubleArray, error) {
 	}
 	b, err := syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
-		b, err = syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_PRIVATE)
-		if err != nil {
-			return nil, fmt.Errorf("mmap error, %v", err)
-		}
+		return nil, fmt.Errorf("mmap error, %v", err)
 	}
-	return &MmapedDoubleArray{
-		f:   f,
+
+	ret := &MmapedDoubleArray{
 		raw: b,
 		r:   bytes.NewReader(b[MmapedFileHeaderSize:]),
-	}, nil
+	}
+	runtime.SetFinalizer(ret, (*MmapedDoubleArray).Close)
+	return ret, nil
 }
 
 func (a MmapedDoubleArray) at(i uint32) (unit, error) {
@@ -94,9 +94,12 @@ func (a MmapedDoubleArray) CommonPrefixSearchCallback(key string, offset int, ca
 }
 
 // Close deletes the mapped memory and closes the opened file.
-func (a MmapedDoubleArray) Close() error {
-	if err := syscall.Munmap(a.raw); err != nil {
-		return fmt.Errorf("munmap error, %v", err)
+func (a *MmapedDoubleArray) Close() error {
+	if a.raw == nil {
+		return nil
 	}
-	return a.f.Close()
+	data := a.raw
+	a.raw = nil
+	runtime.SetFinalizer(a, nil)
+	return syscall.Munmap(data)
 }
