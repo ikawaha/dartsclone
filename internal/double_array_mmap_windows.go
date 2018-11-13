@@ -24,6 +24,7 @@ import (
 	"os"
 	"runtime"
 	"syscall"
+	"unsafe"
 )
 
 const (
@@ -64,7 +65,7 @@ func openMmap(f *os.File, offset, length int) (*MmapedDoubleArray, error) {
 	if err != nil {
 		return nil, err
 	}
-	b := (*[maxBytes]byte)(unsafe.Pointer(ptr))[:size]
+	b := (*[maxBytes]byte)(unsafe.Pointer(ptr))[:length]
 
 	ret := &MmapedDoubleArray{
 		raw: b,
