@@ -15,7 +15,8 @@
 package progressbar
 
 import (
-	progressbar "github.com/schollz/progressbar/v2"
+	ansi "github.com/k0kubun/go-ansi"
+	"github.com/schollz/progressbar/v2"
 )
 
 // ProgressBar represents a progress bar that implements ProgressFunction interface.
@@ -30,7 +31,19 @@ func New() *ProgressBar {
 
 // SetMaximum sets the maximum of the progress bar.
 func (p *ProgressBar) SetMaximum(max int) {
-	p.ProgressBar = progressbar.New(max)
+	p.ProgressBar = progressbar.NewOptions(max,
+		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
+		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionSetBytes(10000),
+		progressbar.OptionSetWidth(15),
+		progressbar.OptionSetDescription("[cyan][1/3][reset] Writing moshable file..."),
+		progressbar.OptionSetTheme(progressbar.Theme{
+			Saucer:        "[green]=[reset]",
+			SaucerHead:    "[green]>[reset]",
+			SaucerPadding: " ",
+			BarStart:      "[",
+			BarEnd:        "]",
+		}))
 }
 
 // Increment with increase the current count on the progress bar.
