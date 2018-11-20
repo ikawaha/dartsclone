@@ -58,15 +58,88 @@ func (a DoubleArrayUint32) at(i uint32) (unit, error) {
 
 // ExactMatchSearch searches TRIE by a given keyword and returns the id and it's length if found.
 func (a DoubleArrayUint32) ExactMatchSearch(key string) (id, size int, err error) {
-	return exactMatchSearch(a, key)
+	nodePos := uint32(0)
+	unit, err := a.at(nodePos)
+	if err != nil {
+		return -1, -1, err
+	}
+	for i := 0; i < len(key); i++ {
+		nodePos ^= unit.offset() ^ uint32(key[i])
+		unit, err = a.at(nodePos)
+		if err != nil {
+			return -1, -1, err
+		}
+		if unit.label() != key[i] {
+			return -1, 0, nil
+		}
+	}
+	if !unit.hasLeaf() {
+		return -1, 0, nil
+	}
+	unit, err = a.at(nodePos ^ unit.offset())
+	if err != nil {
+		return -1, -1, err
+	}
+	return int(unit.value()), len(key), nil
 }
 
 // CommonPrefixSearch finds keywords sharing common prefix in an input and returns the ids and it's lengths if found.
 func (a DoubleArrayUint32) CommonPrefixSearch(key string, offset int) (ids, sizes []int, err error) {
-	return commonPrefixSearch(a, key, offset)
+	nodePos := uint32(0)
+	unit, err := a.at(nodePos)
+	if err != nil {
+		return ids, sizes, err
+	}
+	nodePos ^= unit.offset()
+	for i := offset; i < len(key); i++ {
+		k := key[i]
+		nodePos ^= uint32(k)
+		unit, err := a.at(nodePos)
+		if err != nil {
+			return ids, sizes, err
+		}
+		if unit.label() != k {
+			break
+		}
+		nodePos ^= unit.offset()
+		if unit.hasLeaf() {
+			u, err := a.at(nodePos)
+			if err != nil {
+				return ids, sizes, err
+			}
+			ids = append(ids, int(u.value()))
+			sizes = append(sizes, i+1)
+		}
+	}
+	return ids, sizes, nil
 }
 
 // CommonPrefixSearchCallback finds keywords sharing common prefix in an input and callback with id and it's length.
 func (a DoubleArrayUint32) CommonPrefixSearchCallback(key string, offset int, callback func(id, size int)) error {
-	return commonPrefixSearchCallback(a, key, offset, callback)
+	nodePos := uint32(0)
+	unit, err := a.at(nodePos)
+	if err != nil {
+		return err
+	}
+	nodePos ^= unit.offset()
+	for i := offset; i < len(key); i++ {
+		k := key[i]
+		nodePos ^= uint32(k)
+		unit, err := a.at(nodePos)
+		if err != nil {
+			return err
+		}
+		if unit.label() != k {
+			break
+		}
+		nodePos ^= unit.offset()
+		if unit.hasLeaf() {
+			u, err := a.at(nodePos)
+			if err != nil {
+				return err
+			}
+			callback(int(u.value()), i+1)
+		}
+	}
+	return nil
 }
