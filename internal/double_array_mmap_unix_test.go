@@ -34,10 +34,14 @@ func TestMmapedDoubleArray_ExactMatchSearch(t *testing.T) {
 	}
 	t.Run("keys", func(t *testing.T) {
 		builder := DoubleArrayBuilder{}
-		builder.Build(keys, nil)
+		if err := builder.Build(keys, nil); err != nil {
+			t.Errorf("unexpected error, %v", err)
+		}
 		var b bytes.Buffer
-		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		if _, err := builder.WriteTo(&b); err != nil {
+			t.Errorf("unexpected error, %v", err)
+		}
+		mmaped := MmapedDoubleArray{raw: b.Bytes()}
 		for i, v := range keys {
 			id, size, err := mmaped.ExactMatchSearch(v)
 			if err != nil {
@@ -57,7 +61,7 @@ func TestMmapedDoubleArray_ExactMatchSearch(t *testing.T) {
 		builder.Build(keys, ids)
 		var b bytes.Buffer
 		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		mmaped := MmapedDoubleArray{raw: b.Bytes()}
 		for i, v := range keys {
 			id, size, err := mmaped.ExactMatchSearch(v)
 			if err != nil {
@@ -85,7 +89,7 @@ func TestMmapedDoubleArray_CommonPrefixSearch(t *testing.T) {
 		builder.Build(keys, nil)
 		var b bytes.Buffer
 		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		mmaped := MmapedDoubleArray{raw: b.Bytes()}
 		ids, sizes, err := mmaped.CommonPrefixSearch("電気通信大学大学院大学", 0)
 		if err != nil {
 			t.Errorf("unexpected error, %v", err)
@@ -114,7 +118,7 @@ func TestMmapedDoubleArray_CommonPrefixSearchCallback(t *testing.T) {
 		builder.Build(keys, nil)
 		var b bytes.Buffer
 		builder.WriteTo(&b)
-		mmaped := MmapedDoubleArray{r: bytes.NewReader(b.Bytes()[8:])} // header size is 8
+		mmaped := MmapedDoubleArray{raw: b.Bytes()}
 		var ids, sizes []int
 		mmaped.CommonPrefixSearchCallback("電気通信大学大学院大学", 0, func(id, size int) {
 			ids = append(ids, id)
@@ -137,7 +141,7 @@ func TestOpenMmap(t *testing.T) {
 		}
 	})
 	t.Run("open sample binary of mmaped double array", func(t *testing.T) {
-		da, err := OpenMmaped("./_testdata/mmapbin_20_1_2_3_4_5")
+		da, err := OpenMmaped("./_testdata/mmapbin_1_2_3_4_5")
 		if err != nil {
 			t.Fatalf("unexpected error, %v", err)
 		}
@@ -157,7 +161,7 @@ func TestOpenMmap(t *testing.T) {
 }
 
 func TestMmapedDoubleArray_At(t *testing.T) {
-	da, err := OpenMmaped("./_testdata/mmapbin_20_1_2_3_4_5")
+	da, err := OpenMmaped("./_testdata/mmapbin_1_2_3_4_5")
 	if err != nil {
 		t.Fatalf("unexpected error, %v", err)
 	}

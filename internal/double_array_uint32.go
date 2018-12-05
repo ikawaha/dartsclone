@@ -32,14 +32,17 @@ func Open(name string) (*DoubleArrayUint32, error) {
 		return nil, err
 	}
 	defer f.Close()
-
-	var length int64
-	if err := binary.Read(f, binary.LittleEndian, &length); err != nil {
-		return nil, fmt.Errorf("broken header, %v", err)
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
+	size := info.Size()
+	if size != int64(int(size)) {
+		return nil, fmt.Errorf("too large file")
 	}
 	var ret DoubleArrayUint32
-	ret.array = make([]uint32, 0, length/4)
-	for i := int64(0); i < length; i += 4 {
+	ret.array = make([]uint32, 0, size/4)
+	for i := int64(0); i < size; i += 4 {
 		var u uint32
 		if err := binary.Read(f, binary.LittleEndian, &u); err != nil {
 			return nil, fmt.Errorf("broken array, %v", err)

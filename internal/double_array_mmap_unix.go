@@ -17,10 +17,8 @@
 package internal
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"os"
 	"runtime"
 	"syscall"
@@ -33,7 +31,6 @@ const (
 // MmapedDoubleArray represents the TRIE data structure mapped on the virtual memory address.
 type MmapedDoubleArray struct {
 	raw []byte
-	r   *bytes.Reader
 }
 
 // OpenMmaped opens the named file of double array and maps it on the memory.
@@ -43,25 +40,30 @@ func OpenMmaped(name string) (*MmapedDoubleArray, error) {
 		return nil, err
 	}
 	defer f.Close()
-	var length int64
-	if err := binary.Read(f, binary.LittleEndian, &length); err != nil {
-		return nil, fmt.Errorf("broken header, %v", err)
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
 	}
-	return openMmap(f, 0, MmapedFileHeaderSize+int(length))
+	size := info.Size()
+	if size != int64(int(size)) {
+		return nil, fmt.Errorf("too large file")
+	}
+	return openMmap(f, 0, int(size))
 }
 
-func openMmap(f *os.File, offset, length int) (*MmapedDoubleArray, error) {
+func openMmap(f *os.File, offset, size int) (*MmapedDoubleArray, error) {
 	if int64(offset)%int64(os.Getpagesize()) != 0 {
 		return nil, fmt.Errorf("offset parameter must be a multiple of the system's page size")
 	}
-	b, err := syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_SHARED)
+	if size%unitSize != 0 {
+		return nil, fmt.Errorf("invalid file size, %v", size)
+	}
+	b, err := syscall.Mmap(int(f.Fd()), int64(offset), size, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
 		return nil, fmt.Errorf("mmap error, %v", err)
 	}
-
 	ret := &MmapedDoubleArray{
 		raw: b,
-		r:   bytes.NewReader(b[MmapedFileHeaderSize:]),
 	}
 	runtime.SetFinalizer(ret, (*MmapedDoubleArray).Close)
 	return ret, nil
@@ -79,13 +81,10 @@ func (a *MmapedDoubleArray) Close() error {
 }
 
 func (a MmapedDoubleArray) at(i uint32) (unit, error) {
-	if _, err := a.r.Seek(int64(i*4), io.SeekStart); err != nil {
-		return 0, fmt.Errorf("seek error, %v", err)
+	if int(i+1)*unitSize > len(a.raw) {
+		return 0, fmt.Errorf("index out of bounds")
 	}
-	var ret uint32
-	if err := binary.Read(a.r, binary.LittleEndian, &ret); err != nil {
-		return 0, fmt.Errorf("read error, %v", err)
-	}
+	ret := binary.LittleEndian.Uint32(a.raw[i*unitSize : (i+1)*unitSize])
 	return unit(ret), nil
 }
 
