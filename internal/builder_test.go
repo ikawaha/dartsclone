@@ -131,12 +131,11 @@ func TestDoubleArrayBuilder_WriteTo(t *testing.T) {
 		var b bytes.Buffer
 		if size, err := builder.WriteTo(&b); err != nil {
 			t.Errorf("unexpected error, %v", err)
-		} else if expected := int64(8 + 4*5); size != expected {
+		} else if expected := int64(unitSize * 5); size != expected {
 			t.Errorf("expected %v, got %v", expected, size)
 		}
 		got := b.Bytes()
 		expected := []byte{
-			20, 0, 0, 0, 0, 0, 0, 0, //size int64(20) <<little endian>>
 			1, 0, 0, 0, // uint32(1)
 			2, 0, 0, 0, // uint32(2)
 			3, 0, 0, 0, // uint32(3)

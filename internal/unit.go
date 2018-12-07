@@ -22,6 +22,8 @@ const maxOffset = 1 << 29
 
 type unit uint32
 
+const unitSize = 4
+
 func (u *unit) setHasLeaf(hasLeaf bool) {
 	if hasLeaf {
 		*u = unit(int32(*u) | 1<<8)

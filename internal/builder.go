@@ -103,11 +103,6 @@ func (b DoubleArrayBuilder) toArray() []uint32 {
 // WriteTo write to the serialize data of the double array.
 func (b DoubleArrayBuilder) WriteTo(w io.Writer) (int64, error) {
 	var size int64
-	x := int64(len(b.units) * 4) // size * uint32
-	if err := binary.Write(w, binary.LittleEndian, x); err != nil {
-		return size, fmt.Errorf("header write error, %v", err)
-	}
-	size += int64(binary.Size(x))
 	for _, v := range b.units {
 		if err := binary.Write(w, binary.LittleEndian, uint32(v)); err != nil {
 			return size, err

@@ -17,10 +17,8 @@
 package internal
 
 import (
-	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"os"
 	"runtime"
 	"syscall"
@@ -33,7 +31,6 @@ const (
 // MmapedDoubleArray represents the TRIE data structure mapped on the virtual memory address.
 type MmapedDoubleArray struct {
 	raw []byte
-	r   *bytes.Reader
 }
 
 // OpenMmaped opens the named file of double array and maps it on the memory.
@@ -43,54 +40,33 @@ func OpenMmaped(name string) (*MmapedDoubleArray, error) {
 		return nil, err
 	}
 	defer f.Close()
-	var length int64
-	if err := binary.Read(f, binary.LittleEndian, &length); err != nil {
-		return nil, fmt.Errorf("broken header, %v", err)
+	info, err := f.Stat()
+	if err != nil {
+		return nil, err
 	}
-	return openMmap(f, 0, MmapedFileHeaderSize+int(length))
+	size := info.Size()
+	if size != int64(int(size)) {
+		return nil, fmt.Errorf("too large file")
+	}
+	return openMmap(f, 0, int(size))
 }
 
-func openMmap(f *os.File, offset, length int) (*MmapedDoubleArray, error) {
+func openMmap(f *os.File, offset, size int) (*MmapedDoubleArray, error) {
 	if int64(offset)%int64(os.Getpagesize()) != 0 {
 		return nil, fmt.Errorf("offset parameter must be a multiple of the system's page size")
 	}
-	b, err := syscall.Mmap(int(f.Fd()), int64(offset), length, syscall.PROT_READ, syscall.MAP_SHARED)
+	if size%unitSize != 0 {
+		return nil, fmt.Errorf("invalid file size, %v", size)
+	}
+	b, err := syscall.Mmap(int(f.Fd()), int64(offset), size, syscall.PROT_READ, syscall.MAP_SHARED)
 	if err != nil {
 		return nil, fmt.Errorf("mmap error, %v", err)
 	}
-
 	ret := &MmapedDoubleArray{
 		raw: b,
-		r:   bytes.NewReader(b[MmapedFileHeaderSize:]),
 	}
 	runtime.SetFinalizer(ret, (*MmapedDoubleArray).Close)
 	return ret, nil
-}
-
-func (a MmapedDoubleArray) at(i uint32) (unit, error) {
-	if _, err := a.r.Seek(int64(i*4), io.SeekStart); err != nil {
-		return 0, fmt.Errorf("seek error, %v", err)
-	}
-	var ret uint32
-	if err := binary.Read(a.r, binary.LittleEndian, &ret); err != nil {
-		return 0, fmt.Errorf("read error, %v", err)
-	}
-	return unit(ret), nil
-}
-
-// ExactMatchSearch searches TRIE by a given keyword and returns the id and it's length if found.
-func (a MmapedDoubleArray) ExactMatchSearch(key string) (id, size int, err error) {
-	return exactMatchSearch(a, key)
-}
-
-// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the ids and it's lengths if found.
-func (a MmapedDoubleArray) CommonPrefixSearch(key string, offset int) (ids, sizes []int, err error) {
-	return commonPrefixSearch(a, key, offset)
-}
-
-// CommonPrefixSearchCallback finds keywords sharing common prefix in an input and callback with id and it's length.
-func (a MmapedDoubleArray) CommonPrefixSearchCallback(key string, offset int, callback func(id, size int)) error {
-	return commonPrefixSearchCallback(a, key, offset, callback)
 }
 
 // Close deletes the mapped memory and closes the opened file.
@@ -102,4 +78,100 @@ func (a *MmapedDoubleArray) Close() error {
 	a.raw = nil
 	runtime.SetFinalizer(a, nil)
 	return syscall.Munmap(data)
+}
+
+func (a MmapedDoubleArray) at(i uint32) (unit, error) {
+	if int(i+1)*unitSize > len(a.raw) {
+		return 0, fmt.Errorf("index out of bounds")
+	}
+	ret := binary.LittleEndian.Uint32(a.raw[i*unitSize : (i+1)*unitSize])
+	return unit(ret), nil
+}
+
+// ExactMatchSearch searches TRIE by a given keyword and returns the id and it's length if found.
+func (a MmapedDoubleArray) ExactMatchSearch(key string) (id, size int, err error) {
+	nodePos := uint32(0)
+	unit, err := a.at(nodePos)
+	if err != nil {
+		return -1, -1, err
+	}
+	for i := 0; i < len(key); i++ {
+		nodePos ^= unit.offset() ^ uint32(key[i])
+		unit, err = a.at(nodePos)
+		if err != nil {
+			return -1, -1, err
+		}
+		if unit.label() != key[i] {
+			return -1, 0, nil
+		}
+	}
+	if !unit.hasLeaf() {
+		return -1, 0, nil
+	}
+	unit, err = a.at(nodePos ^ unit.offset())
+	if err != nil {
+		return -1, -1, err
+	}
+	return int(unit.value()), len(key), nil
+}
+
+// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the ids and it's lengths if found.
+func (a MmapedDoubleArray) CommonPrefixSearch(key string, offset int) (ids, sizes []int, err error) {
+	nodePos := uint32(0)
+	unit, err := a.at(nodePos)
+	if err != nil {
+		return ids, sizes, err
+	}
+	nodePos ^= unit.offset()
+	for i := offset; i < len(key); i++ {
+		k := key[i]
+		nodePos ^= uint32(k)
+		unit, err := a.at(nodePos)
+		if err != nil {
+			return ids, sizes, err
+		}
+		if unit.label() != k {
+			break
+		}
+		nodePos ^= unit.offset()
+		if unit.hasLeaf() {
+			u, err := a.at(nodePos)
+			if err != nil {
+				return ids, sizes, err
+			}
+			ids = append(ids, int(u.value()))
+			sizes = append(sizes, i+1)
+		}
+	}
+	return ids, sizes, nil
+}
+
+// CommonPrefixSearchCallback finds keywords sharing common prefix in an input and callback with id and it's length.
+func (a MmapedDoubleArray) CommonPrefixSearchCallback(key string, offset int, callback func(id, size int)) error {
+	nodePos := uint32(0)
+	unit, err := a.at(nodePos)
+	if err != nil {
+		return err
+	}
+	nodePos ^= unit.offset()
+	for i := offset; i < len(key); i++ {
+		k := key[i]
+		nodePos ^= uint32(k)
+		unit, err := a.at(nodePos)
+		if err != nil {
+			return err
+		}
+		if unit.label() != k {
+			break
+		}
+		nodePos ^= unit.offset()
+		if unit.hasLeaf() {
+			u, err := a.at(nodePos)
+			if err != nil {
+				return err
+			}
+			callback(int(u.value()), i+1)
+		}
+	}
+	return nil
 }

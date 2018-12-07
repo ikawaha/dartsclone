@@ -1,3 +1,5 @@
+github.com/euclidr/darts v0.0.0-20180401113647-e0859b23b68e h1:SJ6NVXT96EzZgSX2V5NBVYGsHyxHXrDhhtrWOKe4n/k=
+github.com/euclidr/darts v0.0.0-20180401113647-e0859b23b68e/go.mod h1:uZOcB9m9tCkJHZFC3diz9McvyuzFL3wWG+Wn1IiNXjI=
 github.com/ikawaha/da v0.0.0-20141126165404-5556b9e515ca h1:Ye8wDuFVpINaiKj26eAOwmqBAWDEEVdhgEtyUCfUMw8=
 github.com/ikawaha/da v0.0.0-20141126165404-5556b9e515ca/go.mod h1:JZfcL9+WaPkxDS7OBk09o8VkkV7YYI9yLQG610HxZds=
 github.com/mitchellh/colorstring v0.0.0-20150917214807-8631ce90f286 h1:KHyL+3mQOF9sPfs26lsefckcFNDcIZtiACQiECzIUkw=
