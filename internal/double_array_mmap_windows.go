@@ -21,8 +21,9 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 const (
@@ -57,12 +58,12 @@ func openMmap(f *os.File, offset, size int) (*MmapedDoubleArray, error) {
 		return nil, fmt.Errorf("offset parameter must be a multiple of the system's page size")
 	}
 	low, high := uint32(size), uint32(size>>32)
-	fm, err := syscall.CreateFileMapping(syscall.Handle(f.Fd()), nil, syscall.PAGE_READONLY, high, low, nil)
+	fm, err := windows.CreateFileMapping(windows.Handle(f.Fd()), nil, windows.PAGE_READONLY, high, low, nil)
 	if err != nil {
 		return nil, err
 	}
-	defer syscall.CloseHandle(fm)
-	ptr, err := syscall.MapViewOfFile(fm, syscall.FILE_MAP_READ, 0, 0, uintptr(size))
+	defer windows.CloseHandle(fm)
+	ptr, err := windows.MapViewOfFile(fm, windows.FILE_MAP_READ, 0, 0, uintptr(size))
 	if err != nil {
 		return nil, err
 	}
@@ -179,5 +180,5 @@ func (a *MmapedDoubleArray) Close() error {
 	data := a.raw
 	a.raw = nil
 	runtime.SetFinalizer(a, nil)
-	return syscall.UnmapViewOfFile(uintptr(unsafe.Pointer(&data[0])))
+	return windows.UnmapViewOfFile(uintptr(unsafe.Pointer(&data[0])))
 }

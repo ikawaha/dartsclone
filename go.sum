@@ -6,3 +6,5 @@ github.com/mitchellh/colorstring v0.0.0-20150917214807-8631ce90f286 h1:KHyL+3mQO
 github.com/mitchellh/colorstring v0.0.0-20150917214807-8631ce90f286/go.mod h1:l0dey0ia/Uv7NcFFVbCLtqEBQbrT4OCwCSKTEv6enCw=
 github.com/schollz/progressbar/v2 v2.7.1 h1:wEojKO9r+zgGEEgJSsu7QcVAM0NeEP64Ad4lHK12A5A=
 github.com/schollz/progressbar/v2 v2.7.1/go.mod h1:l6tn6yU6ZdQoF8lwX/VoAUQ3FjhCbrcZDnl9xeWZzYw=
+golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06 h1:0oC8rFnE+74kEmuHZ46F6KHsMr5Gx2gUQPuNz28iQZM=
+golang.org/x/sys v0.0.0-20181213200352-4d1cda033e06/go.mod h1:STP8DvDyc/dI5b8T5hshtkjS+E42TnysNCUPdjciGhY=
