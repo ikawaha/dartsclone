@@ -7,7 +7,6 @@ go:
   - tip
 
 sudo: false
-cache: bundler
 
 git:
   depth: 1
