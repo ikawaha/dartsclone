@@ -58,9 +58,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
-	for i := 0; i < len(ids); i++ {
-		fmt.Printf("id=%d, common prefix=%s\n", ids[i], "電気通信大学大学院大学"[0:sizes[i]])
+	ret, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
+	for i := 0; i < len(ret); i++ {
+		fmt.Printf("id=%d, common prefix=%s\n", ret[i][0], "電気通信大学大学院大学"[0:ret[i][1]])
 	}
 }
 ```
@@ -101,9 +101,9 @@ func main() {
 	}
 	defer trie.Close() // ← ★
 
-	ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
+	ret, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
 	for i := 0; i < len(ids); i++ {
-		fmt.Printf("id=%d, common prefix=%s\n", ids[i], "電気通信大学大学院大学"[0:sizes[i]])
+		fmt.Printf("id=%d, common prefix=%s\n", ret[i][0], "電気通信大学大学院大学"[0:ret[i][1]])
 	}
 }
 ```

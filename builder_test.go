@@ -113,15 +113,15 @@ func TestBuildTRIE(t *testing.T) {
 			t.Errorf("unexpected error, %v", err)
 		}
 		t.Run("check", func(t *testing.T) {
-			ids, sizes, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
+			ret, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
 			if err != nil {
 				t.Errorf("unexpected error, %v", err)
 			}
-			for i := 0; i < len(ids); i++ {
-				if got, expected := ids[i], i; got != expected {
+			for i := 0; i < len(ret); i++ {
+				if got, expected := ret[i][0], i; got != expected {
 					t.Errorf("got %v, expected %v", got, expected)
 				}
-				if got, expected := "電気通信大学大学院大学"[0:sizes[i]], keys[i]; got != expected {
+				if got, expected := "電気通信大学大学院大学"[0:ret[i][1]], keys[i]; got != expected {
 					t.Errorf("got %v, expected %v", got, expected)
 				}
 			}

@@ -83,15 +83,12 @@ func TestDoubleArrayUint32_CommonPrefixSearch(t *testing.T) {
 		if err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
-		ids, sizes, err := a.CommonPrefixSearch("電気通信大学大学院大学", 0)
+		ret, err := a.CommonPrefixSearch("電気通信大学大学院大学", 0)
 		if err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
-		if expected := []int{2, 3, 4, 5, 6}; !reflect.DeepEqual(expected, ids) {
-			t.Errorf("ids: expected %v, got %v", expected, ids)
-		}
-		if expected := []int{6, 12, 18, 27, 33}; !reflect.DeepEqual(expected, sizes) {
-			t.Errorf("sizes: expected %v, got %v", expected, sizes)
+		if expected := [][2]int{[2]int{2, 6}, [2]int{3, 12}, [2]int{4, 18}, [2]int{5, 27}, [2]int{6, 33}}; !reflect.DeepEqual(expected, ret) {
+			t.Errorf("expected %v, got %v", expected, ret)
 		}
 	})
 }
@@ -112,10 +109,12 @@ func TestDoubleArrayUint32_CommonPrefixSearchCallback(t *testing.T) {
 			t.Errorf("unexpected error, %v", err)
 		}
 		var ids, sizes []int
-		a.CommonPrefixSearchCallback("電気通信大学大学院大学", 0, func(id, size int) {
+		if err := a.CommonPrefixSearchCallback("電気通信大学大学院大学", 0, func(id, size int) {
 			ids = append(ids, id)
 			sizes = append(sizes, size)
-		})
+		}); err != nil {
+			t.Errorf("unexpected error, %v", err)
+		}
 		if expected := []int{2, 3, 4, 5, 6}; !reflect.DeepEqual(expected, ids) {
 			t.Errorf("ids: expected %v, got %v", expected, ids)
 		}
