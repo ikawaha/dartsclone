@@ -21,7 +21,8 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -58,7 +59,7 @@ func openMmap(f *os.File, offset, size int) (*MmapedDoubleArray, error) {
 	if size%unitSize != 0 {
 		return nil, fmt.Errorf("invalid file size, %v", size)
 	}
-	b, err := syscall.Mmap(int(f.Fd()), int64(offset), size, syscall.PROT_READ, syscall.MAP_SHARED)
+	b, err := unix.Mmap(int(f.Fd()), int64(offset), size, unix.PROT_READ, unix.MAP_SHARED)
 	if err != nil {
 		return nil, fmt.Errorf("mmap error, %v", err)
 	}
@@ -77,7 +78,7 @@ func (a *MmapedDoubleArray) Close() error {
 	data := a.raw
 	a.raw = nil
 	runtime.SetFinalizer(a, nil)
-	return syscall.Munmap(data)
+	return unix.Munmap(data)
 }
 
 func (a MmapedDoubleArray) at(i uint32) (unit, error) {
