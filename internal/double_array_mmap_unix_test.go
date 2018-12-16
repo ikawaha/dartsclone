@@ -58,9 +58,13 @@ func TestMmapedDoubleArray_ExactMatchSearch(t *testing.T) {
 			ids[i] = uint32(i * 7)
 		}
 		builder := DoubleArrayBuilder{}
-		builder.Build(keys, ids)
+		if err := builder.Build(keys, ids); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		var b bytes.Buffer
-		builder.WriteTo(&b)
+		if _, err := builder.WriteTo(&b); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		mmaped := MmapedDoubleArray{raw: b.Bytes()}
 		for i, v := range keys {
 			id, size, err := mmaped.ExactMatchSearch(v)
@@ -86,19 +90,20 @@ func TestMmapedDoubleArray_CommonPrefixSearch(t *testing.T) {
 	}
 	t.Run("keys", func(t *testing.T) {
 		builder := DoubleArrayBuilder{}
-		builder.Build(keys, nil)
+		if err := builder.Build(keys, nil); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		var b bytes.Buffer
-		builder.WriteTo(&b)
+		if _, err := builder.WriteTo(&b); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		mmaped := MmapedDoubleArray{raw: b.Bytes()}
-		ids, sizes, err := mmaped.CommonPrefixSearch("電気通信大学大学院大学", 0)
+		ret, err := mmaped.CommonPrefixSearch("電気通信大学大学院大学", 0)
 		if err != nil {
 			t.Errorf("unexpected error, %v", err)
 		}
-		if expected := []int{2, 3, 4, 5, 6}; !reflect.DeepEqual(expected, ids) {
-			t.Errorf("ids: expected %v, got %v", expected, ids)
-		}
-		if expected := []int{6, 12, 18, 27, 33}; !reflect.DeepEqual(expected, sizes) {
-			t.Errorf("sizes: expected %v, got %v", expected, sizes)
+		if expected := [][2]int{[2]int{2, 6}, [2]int{3, 12}, [2]int{4, 18}, [2]int{5, 27}, [2]int{6, 33}}; !reflect.DeepEqual(expected, ret) {
+			t.Errorf("expected %v, got %v", expected, ret)
 		}
 	})
 }
@@ -115,15 +120,21 @@ func TestMmapedDoubleArray_CommonPrefixSearchCallback(t *testing.T) {
 	}
 	t.Run("keys", func(t *testing.T) {
 		builder := DoubleArrayBuilder{}
-		builder.Build(keys, nil)
+		if err := builder.Build(keys, nil); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		var b bytes.Buffer
-		builder.WriteTo(&b)
+		if _, err := builder.WriteTo(&b); err != nil {
+			t.Fatalf("unexpected error, %v", err)
+		}
 		mmaped := MmapedDoubleArray{raw: b.Bytes()}
 		var ids, sizes []int
-		mmaped.CommonPrefixSearchCallback("電気通信大学大学院大学", 0, func(id, size int) {
+		if err := mmaped.CommonPrefixSearchCallback("電気通信大学大学院大学", 0, func(id, size int) {
 			ids = append(ids, id)
 			sizes = append(sizes, size)
-		})
+		}); err != nil {
+			t.Errorf("unexpected error, %v", err)
+		}
 		if expected := []int{2, 3, 4, 5, 6}; !reflect.DeepEqual(expected, ids) {
 			t.Errorf("ids: expected %v, got %v", expected, ids)
 		}

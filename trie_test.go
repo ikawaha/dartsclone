@@ -57,7 +57,7 @@ func BenchmarkTRIE(b *testing.B) {
 		b.Run("common prefix match search", func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
 				for _, v := range keys {
-					if ids, _, err := trie.CommonPrefixSearch(v, 0); len(ids) == 0 || err != nil {
+					if ret, err := trie.CommonPrefixSearch(v, 0); len(ret) == 0 || err != nil {
 						b.Fatalf("unexpected error, missing a keyword %v, err=%v", v, err)
 					}
 				}

@@ -22,8 +22,8 @@ import (
 type Trie interface {
 	// ExactMatchSearch searches TRIE by a given keyword and returns the id and it's length if found.
 	ExactMatchSearch(key string) (id, size int, err error)
-	// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the ids and it's lengths if found.
-	CommonPrefixSearch(key string, offset int) (ids, sizes []int, err error)
+	// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the array of pairs (id and it's length) if found.
+	CommonPrefixSearch(key string, offset int) ([][2]int, error)
 	// CommonPrefixSearchCallback finds keywords sharing common prefix in an input and callback with id and it's length.
 	CommonPrefixSearchCallback(key string, offset int, callback func(id, size int)) error
 }

@@ -111,12 +111,13 @@ func (a MmapedDoubleArray) ExactMatchSearch(key string) (id, size int, err error
 	return int(unit.value()), len(key), nil
 }
 
-// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the ids and it's lengths if found.
-func (a MmapedDoubleArray) CommonPrefixSearch(key string, offset int) (ids, sizes []int, err error) {
+// CommonPrefixSearch finds keywords sharing common prefix in an input and returns the array of pairs (id and it's length) if found.
+func (a MmapedDoubleArray) CommonPrefixSearch(key string, offset int) ([][2]int, error) {
+	var ret [][2]int
 	nodePos := uint32(0)
 	unit, err := a.at(nodePos)
 	if err != nil {
-		return ids, sizes, err
+		return ret, err
 	}
 	nodePos ^= unit.offset()
 	for i := offset; i < len(key); i++ {
@@ -124,7 +125,7 @@ func (a MmapedDoubleArray) CommonPrefixSearch(key string, offset int) (ids, size
 		nodePos ^= uint32(k)
 		unit, err := a.at(nodePos)
 		if err != nil {
-			return ids, sizes, err
+			return ret, err
 		}
 		if unit.label() != k {
 			break
@@ -133,13 +134,12 @@ func (a MmapedDoubleArray) CommonPrefixSearch(key string, offset int) (ids, size
 		if unit.hasLeaf() {
 			u, err := a.at(nodePos)
 			if err != nil {
-				return ids, sizes, err
+				return ret, err
 			}
-			ids = append(ids, int(u.value()))
-			sizes = append(sizes, i+1)
+			ret = append(ret, [2]int{int(u.value()), i + 1})
 		}
 	}
-	return ids, sizes, nil
+	return ret, nil
 }
 
 // CommonPrefixSearchCallback finds keywords sharing common prefix in an input and callback with id and it's length.
