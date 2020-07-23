@@ -102,7 +102,7 @@ func main() {
 	defer trie.Close() // ← ★
 
 	ret, err := trie.CommonPrefixSearch("電気通信大学大学院大学", 0)
-	for i := 0; i < len(ids); i++ {
+	for i := 0; i < len(ret); i++ {
 		fmt.Printf("id=%d, common prefix=%s\n", ret[i][0], "電気通信大学大学院大学"[0:ret[i][1]])
 	}
 }
